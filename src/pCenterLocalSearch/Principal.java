@@ -25,6 +25,8 @@ public class Principal {
 		ArrayList<ArrayList<Double>> distancesClientsSites = new ArrayList<ArrayList<Double>>();
 		double total_distance = 0;
 		double total_time = 0;
+		double maximumDistance = 0, farthestFacility = 0, farthestClient = 0;
+		
 		
 		try (BufferedReader bufferedReader = new BufferedReader(new java.io.FileReader(filename)))
 		{
@@ -86,6 +88,13 @@ public class Principal {
 							total_time = Double.parseDouble(currentLine);
 							break;
 						}
+						case 6: {
+							String[] splittedLine = currentLine.split(" ");
+							maximumDistance = Double.parseDouble(splittedLine[0]);
+							farthestFacility = Double.parseDouble(splittedLine[1]);
+							farthestClient = Double.parseDouble(splittedLine[2]);
+							break;
+						}
 					}
 				}
 			}
@@ -104,8 +113,16 @@ public class Principal {
 			}
 			// Class LocalSearch
 			ls = new LocalSearch(total_sites, p, open_sites, closed_sites, sites_clients, distancesClientsSites, total_distance);
-			// Resolve
+			ls.maximumDistance = maximumDistance;
+			ls.farthestFacility = farthestFacility;
+			ls.farthestClient = farthestClient;
+			
+			// Resolve and set time
+			long startTime = System.nanoTime();
 			ls.ResolveFirstFound();
+			long endTime = System.nanoTime();
+			long totalTime = endTime - startTime;
+			System.out.println("Total execution time " + totalTime + " nanoseconds");
 			ls.Print();
 		}
 		catch (IOException e)

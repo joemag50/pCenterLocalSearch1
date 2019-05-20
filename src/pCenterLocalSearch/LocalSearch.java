@@ -13,6 +13,13 @@ public class LocalSearch {
 	double TotalDistance;
 	double CalulatedTotalDistance;
 	ArrayList<ArrayList<Integer>> clientsFacilities;
+	double maximumDistance;
+	double farthestFacility;
+	double farthestClient;
+	
+	double new_maximumDistance;
+	double new_farthestFacility;
+	double new_farthestClient;
 	
 	LocalSearch (int sites, int p, Integer[] open_sites, Integer[] closed_sites, ArrayList<Integer[]> sites_clients, ArrayList<ArrayList<Double>> distancesClientsSites, double total_distance) {
 		this.Sites = sites;
@@ -23,16 +30,16 @@ public class LocalSearch {
 		this.TotalDistance = total_distance;
 		this.CalulatedTotalDistance = 0;
 		
-        double[][] matrixDistances = new double[distancesClientsSites.size()][];
-        for (int i = 0; i < matrixDistances.length; i++) {
-            matrixDistances[i] = new double[distancesClientsSites.get(i).size()];
-        }
-        for (int i = 0; i < distancesClientsSites.size(); i++) {
-            for (int j = 0; j < distancesClientsSites.get(i).size(); j++) {
-                matrixDistances[i][j] = distancesClientsSites.get(i).get(j);
-            }
-        }
-        this.matrixDistances = matrixDistances;
+		double[][] matrixDistances = new double[distancesClientsSites.size()][];
+		for (int i = 0; i < matrixDistances.length; i++) {
+			matrixDistances[i] = new double[distancesClientsSites.get(i).size()];
+		}
+		for (int i = 0; i < distancesClientsSites.size(); i++) {
+			for (int j = 0; j < distancesClientsSites.get(i).size(); j++) {
+				matrixDistances[i][j] = distancesClientsSites.get(i).get(j);
+			}
+		}
+		this.matrixDistances = matrixDistances;
 	}
 	
 	public void ResolveFirstFound()
@@ -42,9 +49,9 @@ public class LocalSearch {
 		{
 			for (int j = 0; j < ClosedSites.length; j++)
 			{
-				Move1(OpenSites[i], ClosedSites[j]);
+				Move1(i, j);
 				Distribute();
-				Summatory();
+				GetLargestDistance();
 				if (isGoodMove())
 				{
 					return;
@@ -56,8 +63,10 @@ public class LocalSearch {
 	public void Print()
 	{
 		System.out.println("-----OUTPUT-----");
-		System.out.println("Heuristic TotalDistance: " + TotalDistance);
-		System.out.println("LocalSearch TotalDistance: " + CalulatedTotalDistance);
+		System.out.println("Heuristic Largest distance: " + maximumDistance);
+		System.out.println("Heuristic of facility " + farthestFacility + " and client " + farthestClient);
+		System.out.println("LocalSearch Largest distance: " + new_maximumDistance);
+		System.out.println("LocalSearch of facility " + new_farthestFacility + " and client " + new_farthestClient);
 		System.out.println("-----NEW OPEN SITES-----");
 		for (Integer n : OpenSites)
 		{
@@ -110,9 +119,40 @@ public class LocalSearch {
 		}
 	}
 	
+	void GetLargestDistance()
+	{
+		boolean firstOne = true;
+		int farthestFacility = 0;
+		int farthestClient = 0;
+		double maximumDistance = 0.0;
+		double temporalMaximumDistance = 0.0;
+
+		for (int facility : OpenSites) {
+			for (int client : clientsFacilities.get(facility)) {
+				if (firstOne == true) {
+					maximumDistance = matrixDistances[client][facility];
+					farthestFacility = facility;
+					farthestClient = client;
+					firstOne = false;
+				} else {
+					temporalMaximumDistance = matrixDistances[client][facility];
+					if (temporalMaximumDistance > maximumDistance) {
+						maximumDistance = temporalMaximumDistance;
+						farthestFacility = facility;
+						farthestClient = client;
+					}
+				}
+			}
+		}
+		
+		new_maximumDistance = maximumDistance;
+		new_farthestFacility = farthestFacility;
+		new_farthestClient = farthestClient;
+	}
+	
 	boolean isGoodMove()
 	{
-		return CalulatedTotalDistance <= TotalDistance;
+		return new_maximumDistance < maximumDistance;
 	}
 	
 	void Move1 (int i, int j)
