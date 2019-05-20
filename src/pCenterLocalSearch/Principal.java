@@ -6,11 +6,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
+// Author José Gamboa
 public class Principal {
 
 	public static void main(String[] args)
 	{
-		//Leer archivo
+		//Read File
 		Scanner sc = new Scanner(System.in);
 		System.out.println("Name of the file:");
 		String filename = sc.nextLine();
@@ -21,6 +22,9 @@ public class Principal {
 		Integer[] closed_sites;
 		ArrayList<Integer[]> sites_clients;
 		LocalSearch ls;
+		ArrayList<ArrayList<Double>> distancesClientsSites = new ArrayList<ArrayList<Double>>();
+		double total_distance = 0;
+		double total_time = 0;
 		
 		try (BufferedReader bufferedReader = new BufferedReader(new java.io.FileReader(filename)))
 		{
@@ -28,42 +32,65 @@ public class Principal {
 			double i = 0;
 			open_sites = new Integer[1];
 			sites_clients = new ArrayList<Integer[]>();
+			int data = 0;
 			
 			while ((currentLine = bufferedReader.readLine()) != null) {
-				//Tomar total y cuantos sites tienen que abrirse
-				if (i == 0)
-				{
-					String[] renglon = currentLine.split(" ");
-					total_sites = Integer.parseInt(renglon[0]);
-					p = Integer.parseInt(renglon[1]);
-				}
-				
-				//Hacer arreglo de los sites abiertos
-				if (i == 2)
-				{
-					String[] renglon = currentLine.split(" ");
-					open_sites = new Integer[p];
-					for (int j = 0; j < renglon.length; j++)
-					{
-						open_sites[j] = Integer.parseInt(renglon[j]);
+				if (currentLine.equals("")) {
+					data++;
+				} else {
+					switch (data) {
+						case 0: {
+							// Read total sites, and p sites
+							String[] renglon = currentLine.split(" ");
+							total_sites = Integer.parseInt(renglon[0]);
+							p = Integer.parseInt(renglon[1]);
+							break;
+						}
+						case 1: {
+							// Make array of open sites
+							String[] renglon = currentLine.split(" ");
+							open_sites = new Integer[p];
+							for (int j = 0; j < renglon.length; j++)
+							{
+								open_sites[j] = Integer.parseInt(renglon[j]);
+							}
+							break;
+						}
+						case 2: {
+							String[] renglon = currentLine.split(" ");
+							Integer[] sit_cli = new Integer[renglon.length];
+							
+							for (int j = 0; j < renglon.length; j++)
+							{
+								sit_cli[j] = Integer.parseInt(renglon[j]);
+							}
+							
+							sites_clients.add(sit_cli);
+							break;
+						}
+						case 3: {
+							String[] splittedLine = currentLine.split(" ");
+							ArrayList<Double> splittedDouble = new ArrayList<Double>();;
+							for (String s : splittedLine) {
+								String replace = s.replace(",", ".");
+								splittedDouble.add(Double.parseDouble(replace));
+							}
+							distancesClientsSites.add(splittedDouble);
+							break;
+						}
+						case 4: {
+							total_distance = Double.parseDouble(currentLine);
+							break;
+						}
+						case 5: {
+							total_time = Double.parseDouble(currentLine);
+							break;
+						}
 					}
 				}
-				
-				if (i > 2)
-				{
-					String[] renglon = currentLine.split(" ");
-					Integer[] sit_cli = new Integer[renglon.length];
-					
-					for (int j = 0; j < renglon.length; j++)
-					{
-						sit_cli[j] = Integer.parseInt(renglon[j]);
-					}
-					
-					sites_clients.add(sit_cli);
-				}
-				i++;
 			}
-			//Buscar cuales sites estan cerrados
+
+			// Search Closed sites
 			closed_sites = new Integer[total_sites - p];
 			int l = 0;
 			Arrays.sort(open_sites);
@@ -75,10 +102,10 @@ public class Principal {
 					l++;
 				}
 			}
-			//Crear Clase LocalSearch
-			ls = new LocalSearch(total_sites, p, open_sites, closed_sites, sites_clients);
-			//Imprimir resultado
-			ls.Resolve();
+			// Class LocalSearch
+			ls = new LocalSearch(total_sites, p, open_sites, closed_sites, sites_clients, distancesClientsSites, total_distance);
+			// Resolve
+			ls.ResolveFirstFound();
 			ls.Print();
 		}
 		catch (IOException e)
