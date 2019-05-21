@@ -54,7 +54,7 @@ public class LocalSearch {
 				GetLargestDistance();
 				if (isGoodMove())
 				{
-					return;
+					break;
 				}
 			}
 		}
