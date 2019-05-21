@@ -152,7 +152,7 @@ public class LocalSearch {
 	
 	boolean isGoodMove()
 	{
-		return new_maximumDistance < maximumDistance;
+		return new_maximumDistance <= maximumDistance;
 	}
 	
 	void Move1 (int i, int j)
