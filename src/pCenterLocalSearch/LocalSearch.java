@@ -71,7 +71,7 @@ public class LocalSearch {
 		System.out.println("-----OUTPUT-----");
 		System.out.println("Heuristic Largest distance: " + maximumDistance);
 		System.out.println("Heuristic of facility " + farthestFacility + " and client " + farthestClient);
-		if (isGoodMove())
+		if (new_maximumDistance < maximumDistance)
 		{
 			System.out.println("LocalSearch Largest distance: " + new_maximumDistance);
 			System.out.println("LocalSearch of facility " + new_farthestFacility + " and client " + new_farthestClient);
