@@ -45,6 +45,8 @@ public class LocalSearch {
 	public void ResolveFirstFound()
 	{
 		// First Found
+		//tmp/caca-0.dat-ConstructiveHeuristic.dat
+
 		for (int i = 0; i < OpenSites.length; i++)
 		{
 			for (int j = 0; j < ClosedSites.length; j++)
@@ -55,6 +57,9 @@ public class LocalSearch {
 				if (isGoodMove())
 				{
 					break;
+				} else {
+					Move1(i, j);
+					Distribute();
 				}
 			}
 		}
@@ -62,11 +67,17 @@ public class LocalSearch {
 	
 	public void Print()
 	{
+
 		System.out.println("-----OUTPUT-----");
 		System.out.println("Heuristic Largest distance: " + maximumDistance);
 		System.out.println("Heuristic of facility " + farthestFacility + " and client " + farthestClient);
-		System.out.println("LocalSearch Largest distance: " + new_maximumDistance);
-		System.out.println("LocalSearch of facility " + new_farthestFacility + " and client " + new_farthestClient);
+		if (isGoodMove())
+		{
+			System.out.println("LocalSearch Largest distance: " + new_maximumDistance);
+			System.out.println("LocalSearch of facility " + new_farthestFacility + " and client " + new_farthestClient);
+		} else {
+			System.out.println("No improvement :c");
+		}
 		System.out.println("-----NEW OPEN SITES-----");
 		for (Integer n : OpenSites)
 		{
@@ -160,6 +171,14 @@ public class LocalSearch {
 		int tmp = this.OpenSites[i];
 		this.OpenSites[i] = this.ClosedSites[j];
 		this.ClosedSites[j] = tmp;
+		return;
+	}
+	
+	void unDoMove1 (int i, int j)
+	{
+		int tmp = this.ClosedSites[i];
+		this.ClosedSites[i] = this.OpenSites[j];
+		this.OpenSites[j] = tmp;
 		return;
 	}
 }
